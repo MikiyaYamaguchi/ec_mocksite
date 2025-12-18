@@ -6,5 +6,13 @@ export default defineNuxtConfig({
     public: {
       ecMockApiUrl: ""
     }
-  }
+  },
+  nitro: {
+    devProxy: {
+      "/api": {
+        target: "https://ec-mocksite-server.onrender.com",
+        changeOrigin: true,
+      },
+    },
+  },
 })

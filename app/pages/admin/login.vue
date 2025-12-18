@@ -15,17 +15,14 @@ const onLoginButtonClick = async (): Promise<void> => {
   pending.value = true;
   authFailed.value = false;
   noServerError.value = true;
-  const asyncData = await useFetch(
-    `${config.public.ecMockApiUrl}/admin_user/login/`,
-    {
-      method: "POST",
-      body: {
-        email: email.value,
-        password: password.value,
-      },
-      credentials: "include",
-    }
-  );
+  const asyncData = await useFetch("/api/admin_user/login/", {
+    method: "POST",
+    body: {
+      email: email.value,
+      password: password.value,
+    },
+    credentials: "include",
+  });
 
   if (
     (asyncData.error.value === null || asyncData.error.value === undefined) &&
