@@ -33,6 +33,8 @@ Nuxt4
 - /admin/item/add（商品追加ページ）
 - /admin/item/category/:cat（カテゴリー別商品一覧ページ）
 - /admin/item/tag/:tag（タグ別商品一覧ページ）
+- /admin/user（ユーザー一覧ページ）
+- /admin/user/:id（ユーザー詳細ページ）
 - /admin/settings（各種設定ページ）
 
 ### EC サイト画面
