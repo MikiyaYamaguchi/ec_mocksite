@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AdminUser } from "../../interfaces";
+
 definePageMeta({
   layout: "admin",
 });
@@ -28,6 +30,14 @@ const onLoginButtonClick = async (): Promise<void> => {
     (asyncData.error.value === null || asyncData.error.value === undefined) &&
     asyncData.data.value != null
   ) {
+    const adminUserState = useState<AdminUser | null>("userInfo");
+    if (adminUserState.value != null) {
+      adminUserState.value = {
+        id: asyncData.data.value.user._id,
+        name: asyncData.data.value.user.name,
+        email: asyncData.data.value.user.email,
+      };
+    }
     await navigateTo("/admin");
   } else {
     if (asyncData.error.value?.statusCode === 401) {
