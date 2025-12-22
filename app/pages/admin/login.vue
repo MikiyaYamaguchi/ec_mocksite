@@ -14,22 +14,31 @@ const noServerError = ref(true);
 const authFailed = ref(false);
 
 const onLoginButtonClick = async (): Promise<void> => {
+  const config = useRuntimeConfig();
   pending.value = true;
   authFailed.value = false;
   noServerError.value = true;
-  const asyncData = await useFetch("/api/admin_user/login/", {
-    method: "POST",
-    body: {
-      email: email.value,
-      password: password.value,
-    },
-    credentials: "include",
-  });
+  const asyncData = await useFetch(
+    `${config.public.ecMockApiUrl}/admin_user/login`,
+    {
+      method: "POST",
+      body: {
+        email: email.value,
+        password: password.value,
+      },
+      credentials: "include",
+    }
+  );
+
+  console.log(asyncData.data.value);
 
   if (
     (asyncData.error.value === null || asyncData.error.value === undefined) &&
     asyncData.data.value != null
   ) {
+    const accessToken = useState<string | null>("accessToken");
+    accessToken.value = asyncData.data.value.accessToken;
+    console.log(asyncData.data.value.accessToken);
     const adminUserState = useState<AdminUser | null>("userInfo");
     if (adminUserState.value != null) {
       adminUserState.value = {

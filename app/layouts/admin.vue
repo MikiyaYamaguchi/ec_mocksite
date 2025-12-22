@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import type { AdminUser } from "../interfaces";
+useState<string>("accessToken", (): string => {
+  const accessTokenInit = "";
+  return accessTokenInit;
+});
 useState<AdminUser>("userInfo", (): AdminUser => {
   const userInfoInit = {
     id: "",

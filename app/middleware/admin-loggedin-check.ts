@@ -1,10 +1,25 @@
-import type { AdminUser } from "~/interfaces"
+import type { AdminUser } from "../interfaces";
 
 export default defineNuxtRouteMiddleware(
-	(to, from) => {
-		const adminUserIdCookie = useCookie<string | null>("AdminUserId")
+	async(to, from) => {
+		if (process.server) return
+
+		const adminUserIdCookie = useCookie<string | null>("adminUserId")
+		const accessToken = useState<string | null>("accessToken")
 		const adminUserState = useState<AdminUser | null>("userInfo")
+		const { refresh } = useAdminAuth()
+
 		if (!adminUserIdCookie.value && !adminUserState.value?.id) {
+			return navigateTo("/admin/login")
+		}
+
+		if (accessToken.value) {
+			return
+		}
+
+		try {
+			await refresh()
+		} catch {
 			return navigateTo("/admin/login")
 		}
 	}
