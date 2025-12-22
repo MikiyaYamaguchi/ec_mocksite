@@ -6,5 +6,8 @@ export default defineNuxtConfig({
     public: {
       ecMockApiUrl: ""
     }
-  }
+  },
+  modules: [
+    '@nuxt/icon'
+  ]
 })

@@ -5,8 +5,6 @@ definePageMeta({
   layout: "admin",
 });
 
-const config = useRuntimeConfig();
-
 const email = ref("");
 const password = ref("");
 const pending = ref(false);
