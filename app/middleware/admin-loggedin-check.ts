@@ -2,7 +2,6 @@ import type { AdminUser } from "../interfaces";
 
 export default defineNuxtRouteMiddleware(
 	async(to, from) => {
-		if (process.server) return
 
 		const adminUserIdCookie = useCookie<string | null>("adminUserId")
 		const accessToken = useState<string | null>("accessToken")
@@ -12,6 +11,8 @@ export default defineNuxtRouteMiddleware(
 		if (!adminUserIdCookie.value && !adminUserState.value?.id) {
 			return navigateTo("/admin/login")
 		}
+
+		if (process.server) return
 
 		if (accessToken.value) {
 			return
