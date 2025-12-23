@@ -3,16 +3,28 @@ import UiwUser from "./icons/UiwUser.vue";
 
 const config = useRuntimeConfig();
 const adminUserIdCookie = useCookie<string | null>("adminUserId");
-const loginActive = ref(false);
-const asyncData = await useFetch(
-  `${config.public.ecMockApiUrl}/admin_user/single/${adminUserIdCookie.value}`
-);
-const data = asyncData.data;
-const userInfo = data?.value?.data || null;
 
-if (asyncData.error.value == null && asyncData.data.value != null) {
-  loginActive.value = true;
-}
+const userInfo = ref<any>(null);
+const loginActive = ref(false);
+
+const adminUserFetch = async () => {
+  if (adminUserIdCookie.value) {
+    const asyncData = await useFetch(
+      `${config.public.ecMockApiUrl}/admin_user/single/${adminUserIdCookie.value}`
+    );
+    const data = asyncData.data;
+    userInfo.value = data.value?.data || null;
+    loginActive.value = !!userInfo.value;
+  } else {
+    loginActive.value = false;
+  }
+};
+
+adminUserFetch();
+
+watch(adminUserIdCookie, () => {
+  adminUserFetch();
+});
 </script>
 
 <template>
