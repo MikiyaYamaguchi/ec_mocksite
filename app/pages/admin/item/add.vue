@@ -1,0 +1,228 @@
+<script lang="ts" setup>
+definePageMeta({
+  layout: "admin",
+  middleware: ["admin-loggedin-check"],
+});
+const itemInput = reactive({
+  name: "",
+  price: 0,
+  context: "",
+  img1: null as File | null,
+  img2: null as File | null,
+  img3: null as File | null,
+  stock: 0,
+  category: "",
+  tag: [] as string[],
+});
+const pending = ref(false);
+const noServerError = ref(true);
+const errorMessage = ref<string | null>(null);
+
+const onAddItemButtonClick = async (): Promise<void> => {
+  const config = useRuntimeConfig();
+
+  pending.value = true;
+  noServerError.value = true;
+
+  const formData = new FormData();
+  formData.append("name", itemInput.name);
+  formData.append("price", String(itemInput.price));
+  formData.append("context", itemInput.context);
+  formData.append("stock", String(itemInput.stock));
+  formData.append("category", itemInput.category);
+  itemInput.tag.forEach((tag) => {
+    formData.append("tag[]", tag);
+  });
+
+  if (itemInput.img1) formData.append("img1", itemInput.img1);
+  if (itemInput.img2) formData.append("img2", itemInput.img2);
+  if (itemInput.img3) formData.append("img3", itemInput.img3);
+
+  const asyncData = await useFetch(`${config.public.ecMockApiUrl}/item/`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (
+    (asyncData.error.value === null || asyncData.error.value === undefined) &&
+    asyncData.data.value != null
+  ) {
+    alert("商品の登録に成功しました。");
+  } else {
+    const errorCode = (asyncData?.error?.value?.data as any)?.errorCode;
+
+    switch (errorCode) {
+      case "UPLOAD_ERROR":
+        errorMessage.value = "画像アップロードに失敗しました。";
+        break;
+      case "FILE_SIZE_LIMIT":
+        errorMessage.value = "ファイルサイズが大きすぎます。（上限2MBまで）";
+        break;
+      case "INVALID_FILE_TYPE":
+        errorMessage.value =
+          "このファイル形式ではアップロードができません。（アップロード可能ファイル形式：jpeg・png・webp）";
+        break;
+      default:
+        errorMessage.value =
+          "サーバー処理中に障害が発生しました。もう一度登録を行ってください。";
+    }
+
+    pending.value = false;
+    noServerError.value = false;
+  }
+};
+
+const onFileChange = (event: Event, key: "img1" | "img2" | "img3") => {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    itemInput[key] = target.files[0]!;
+  }
+};
+</script>
+
+<template>
+  <h1>商品追加</h1>
+  <p v-if="pending">登録中・・・</p>
+  <template v-else>
+    <p v-if="noServerError">商品情報を入力してください。</p>
+    <p v-else>
+      {{ errorMessage }}
+    </p>
+    <div class="form-wrap">
+      <form v-on:submit="onAddItemButtonClick">
+        <table>
+          <tbody>
+            <tr>
+              <th>商品名<span class="required">必須</span></th>
+              <td>
+                <input
+                  name="name"
+                  type="text"
+                  v-model="itemInput.name"
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <th>金額<span class="required">必須</span></th>
+              <td>
+                <input
+                  name="price"
+                  type="number"
+                  v-model="itemInput.price"
+                  required
+                />円
+              </td>
+            </tr>
+            <tr>
+              <th>商品紹介文</th>
+              <td>
+                <textarea
+                  name="context"
+                  id="context"
+                  v-model="itemInput.context"
+                ></textarea>
+              </td>
+            </tr>
+            <tr>
+              <th>画像１<span class="required">必須</span></th>
+              <td>
+                <input
+                  type="file"
+                  accept="image/*"
+                  name="img1"
+                  @change="onFileChange($event, 'img1')"
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <th>画像２</th>
+              <td>
+                <input
+                  type="file"
+                  accept="image/*"
+                  name="img2"
+                  @change="onFileChange($event, 'img2')"
+                />
+              </td>
+            </tr>
+            <tr>
+              <th>画像３</th>
+              <td>
+                <input
+                  type="file"
+                  accept="image/*"
+                  name="img3"
+                  @change="onFileChange($event, 'img3')"
+                />
+              </td>
+            </tr>
+            <tr>
+              <th>在庫数<span class="required">必須</span></th>
+              <td>
+                <input
+                  type="number"
+                  name="stock"
+                  v-model="itemInput.stock"
+                  required
+                />個
+              </td>
+            </tr>
+            <tr>
+              <th>カテゴリー</th>
+              <td>
+                <select
+                  name="category"
+                  id="category"
+                  v-model="itemInput.category"
+                >
+                  <option value="">選択する</option>
+                  <option value="家電">家電</option>
+                  <option value="食器">食器</option>
+                  <option value="おもちゃ">おもちゃ</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <th>タグ</th>
+              <td>
+                <label for="tag1">
+                  <input
+                    type="checkbox"
+                    name="tag"
+                    id="tag1"
+                    value="おしゃれ"
+                    v-model="itemInput.tag"
+                  />
+                  <span>おしゃれ</span>
+                </label>
+                <label for="tag2">
+                  <input
+                    type="checkbox"
+                    name="tag"
+                    id="tag2"
+                    value="楽しい"
+                    v-model="itemInput.tag"
+                  />
+                  <span>楽しい</span>
+                </label>
+                <label for="tag3">
+                  <input
+                    type="checkbox"
+                    name="tag"
+                    id="tag3"
+                    value="かわいい"
+                    v-model="itemInput.tag"
+                  />
+                  <span>かわいい</span>
+                </label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <input type="submit" value="登録する" />
+      </form>
+    </div>
+  </template>
+</template>
