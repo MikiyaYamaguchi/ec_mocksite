@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+interface variationsType {
+  key: string;
+  values: string;
+}
 definePageMeta({
   layout: "admin",
   middleware: ["admin-loggedin-check"],
@@ -13,6 +17,7 @@ const itemInput = reactive({
   stock: 0,
   category: "",
   tag: [] as string[],
+  variations: [{ key: "", values: "" }] as variationsType[],
 });
 const pending = ref(false);
 const noServerError = ref(true);
@@ -24,6 +29,8 @@ const onAddItemButtonClick = async (): Promise<void> => {
   pending.value = true;
   noServerError.value = true;
 
+  const variationsArray = [];
+
   const formData = new FormData();
   formData.append("name", itemInput.name);
   formData.append("price", String(itemInput.price));
@@ -33,10 +40,20 @@ const onAddItemButtonClick = async (): Promise<void> => {
   itemInput.tag.forEach((tag) => {
     formData.append("tag[]", tag);
   });
+  const variationsPayload = itemInput.variations
+    .filter((v) => v.key.trim() !== "" && v.values.trim() !== "")
+    .map((v) => ({
+      key: v.key,
+      values: v.values.split(",").map((s) => s.trim()),
+    }));
+
+  formData.append("variations", JSON.stringify(variationsPayload));
 
   if (itemInput.img1) formData.append("img1", itemInput.img1);
   if (itemInput.img2) formData.append("img2", itemInput.img2);
   if (itemInput.img3) formData.append("img3", itemInput.img3);
+
+  console.log(formData);
 
   const asyncData = await useFetch(`${config.public.ecMockApiUrl}/item/`, {
     method: "POST",
@@ -76,6 +93,14 @@ const onFileChange = (event: Event, key: "img1" | "img2" | "img3") => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
     itemInput[key] = target.files[0]!;
+  }
+};
+
+const onVariationsInput = (index: number) => {
+  const current = itemInput.variations[index];
+
+  if (current?.key.trim() !== "" && index === itemInput.variations.length - 1) {
+    itemInput.variations.push({ key: "", values: "" });
   }
 };
 </script>
@@ -217,6 +242,30 @@ const onFileChange = (event: Event, key: "img1" | "img2" | "img3") => {
                   />
                   <span>かわいい</span>
                 </label>
+              </td>
+            </tr>
+            <tr>
+              <th>バリエーション</th>
+              <td>
+                <div
+                  v-for="(variation, index) in itemInput.variations"
+                  :key="index"
+                >
+                  <span>バリエーション名：</span
+                  ><input
+                    type="text"
+                    :name="`variations_${index + 1}`"
+                    @input="onVariationsInput(index)"
+                    v-model="variation.key"
+                  />
+                  <span>バリエーション値：</span
+                  ><input
+                    type="text"
+                    :name="`variations_${index + 1}_values`"
+                    v-model="variation.values"
+                  />
+                </div>
+                <p>※バリエーション値はカンマ区切りで入力してください</p>
               </td>
             </tr>
           </tbody>
