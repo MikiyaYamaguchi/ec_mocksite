@@ -22,6 +22,8 @@ const itemInput = reactive({
 const pending = ref(false);
 const noServerError = ref(true);
 const errorMessage = ref<string | null>(null);
+const { categories } = getCategories();
+const { tags } = getTags();
 
 const onAddItemButtonClick = async (): Promise<void> => {
   const config = useRuntimeConfig();
@@ -203,44 +205,28 @@ const onVariationsInput = (index: number) => {
                   v-model="itemInput.category"
                 >
                   <option value="">選択する</option>
-                  <option value="家電">家電</option>
-                  <option value="食器">食器</option>
-                  <option value="おもちゃ">おもちゃ</option>
+                  <option
+                    v-for="category in categories.data"
+                    :key="category.slug"
+                    :value="category.slug"
+                  >
+                    {{ category.name }}
+                  </option>
                 </select>
               </td>
             </tr>
             <tr>
               <th>タグ</th>
               <td>
-                <label for="tag1">
+                <label v-for="tag in tags.data" :for="tag.slug" :key="tag.slug">
                   <input
                     type="checkbox"
-                    name="tag"
-                    id="tag1"
-                    value="おしゃれ"
+                    :name="tag.slug"
+                    :id="tag.slug"
+                    :value="tag.slug"
                     v-model="itemInput.tag"
                   />
-                  <span>おしゃれ</span>
-                </label>
-                <label for="tag2">
-                  <input
-                    type="checkbox"
-                    name="tag"
-                    id="tag2"
-                    value="楽しい"
-                    v-model="itemInput.tag"
-                  />
-                  <span>楽しい</span>
-                </label>
-                <label for="tag3">
-                  <input
-                    type="checkbox"
-                    name="tag"
-                    id="tag3"
-                    value="かわいい"
-                    v-model="itemInput.tag"
-                  />
-                  <span>かわいい</span>
+                  <span>{{ tag.name }}</span>
                 </label>
               </td>
             </tr>
