@@ -55,8 +55,6 @@ const onAddItemButtonClick = async (): Promise<void> => {
   if (itemInput.img2) formData.append("img2", itemInput.img2);
   if (itemInput.img3) formData.append("img3", itemInput.img3);
 
-  console.log(formData);
-
   const asyncData = await useFetch(`${config.public.ecMockApiUrl}/item/`, {
     method: "POST",
     body: formData,
@@ -208,7 +206,7 @@ const onVariationsInput = (index: number) => {
                   <option
                     v-for="category in categories.data"
                     :key="category.slug"
-                    :value="category.slug"
+                    :value="category.name"
                   >
                     {{ category.name }}
                   </option>
@@ -223,7 +221,7 @@ const onVariationsInput = (index: number) => {
                     type="checkbox"
                     :name="tag.slug"
                     :id="tag.slug"
-                    :value="tag.slug"
+                    :value="tag.name"
                     v-model="itemInput.tag"
                   />
                   <span>{{ tag.name }}</span>

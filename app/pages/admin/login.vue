@@ -28,15 +28,12 @@ const onLoginButtonClick = async (): Promise<void> => {
     }
   );
 
-  console.log(asyncData.data.value);
-
   if (
     (asyncData.error.value === null || asyncData.error.value === undefined) &&
     asyncData.data.value != null
   ) {
     const accessToken = useState<string | null>("accessToken");
     accessToken.value = asyncData.data.value.accessToken;
-    console.log(asyncData.data.value.accessToken);
     const adminUserState = useState<AdminUser | null>("userInfo");
     if (adminUserState.value != null) {
       adminUserState.value = {
