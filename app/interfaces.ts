@@ -5,15 +5,16 @@ export interface AdminUser {
 }
 
 export interface Item {
+	_id: string,
 	name: string,
 	price: number,
-	context: string,
+	context?: string,
 	img1: string,
-	imt2: string,
-	img3: string,
+	img2?: string,
+	img3?: string,
 	stock: number,
-	category: string,
-	tag: string[],
-	variations: [{key: string, values: string[]}],
-	variations_prices: [{value: string, price: number}]
+	category?: string,
+	tag?: string[],
+	variations?: [{key: string, values: string[]}],
+	variations_prices?: [{value: string, price: number}]
 }
