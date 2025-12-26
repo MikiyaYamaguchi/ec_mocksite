@@ -17,6 +17,8 @@ defineProps<{
       v-bind:stock="item.stock"
       v-bind:category="item.category"
       v-bind:tag="item.tag"
+      v-bind:variations="item.variations"
+      v-bind:variations_prices="item.variations_prices"
     />
   </ul>
 </template>

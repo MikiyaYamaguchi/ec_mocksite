@@ -16,5 +16,5 @@ export interface Item {
 	category?: string,
 	tag?: string[],
 	variations?: [{key: string, values: string[]}],
-	variations_prices?: [{value: string, price: number}]
+	variations_prices?: {value: string, price: number}[]
 }
